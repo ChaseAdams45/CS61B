@@ -1,20 +1,39 @@
 public class ArrayDeque<Item> {
+
     private Item[] items;
     private int size;
+    private int pointerFirst;
+    private int pointerLast;
     private static int RFACTOR = 2;
 
 
-
     public ArrayDeque() {
-        size = 0;
-        items = (Item[]) new Object[8];
 
+        size = 0;
+        pointerFirst = 3;
+        pointerLast = 4;
+        items = (Item[]) new Object[8];
+    }
+
+    private int minusOne(int index) {
+
+        if (index == 0) {return items.length;}
+        return index - 1;
     }
 
     private void resize(int capacity) {
 
         Item[] fresh = (Item[]) new Object[capacity];
-        System.arraycopy(items, 0, fresh, 0, size);
+
+        for (int i = 0; i <= pointerFirst; i++) {
+            fresh[i] = items[i];
+        }
+
+        for (int i = pointerLast; i < size; i++) {
+            fresh[i + size] = items[i];
+        }
+
+        pointerFirst += size;
         items = fresh;
     }
 
@@ -23,7 +42,11 @@ public class ArrayDeque<Item> {
      */
     public void addFirst(Item i) {
 
-        items[0] = i;
+        if (size == items.length) { resize(size * RFACTOR); }
+
+        items[pointerFirst] = i;
+        pointerFirst--;
+        if (pointerFirst < 0) { pointerFirst = items.length - 1;}
         size++;
     }
 
@@ -32,11 +55,11 @@ public class ArrayDeque<Item> {
      */
     public void addLast(Item i) {
 
-        if (size == items.length) {
-            resize(size * RFACTOR);
-        }
+        if (size == items.length) { resize(size * RFACTOR); }
 
-        items[size] = i;;
+        items[pointerLast] = i;
+        pointerLast++;
+        if (pointerLast == items.length) { pointerLast = 0;}
         size++;
     }
 
@@ -60,10 +83,10 @@ public class ArrayDeque<Item> {
     Prints the items in the Deque from first to last, separated by a space.
      */
     public void printDeque() {
-
-        for (int i = 0; i < this.size(); i++) {
+        for (int i = 0; i < items.length; i++) {
             System.out.print(this.get(i) + " ");
         }
+
     }
 
     /*
@@ -72,16 +95,11 @@ public class ArrayDeque<Item> {
      */
     public Item removeFirst() {
 
-        return null;
-    }
-
-    /*
-    Returns the item at the back of the Deque.
-    If no such item exists, returns null.
-     */
-    private Item getBack() {
-
-        return items[size - 1];
+        Item removed = items[pointerFirst + 1];
+        items[pointerFirst + 1] = null;
+        pointerFirst++;
+        size--;
+        return removed;
     }
 
     /*
@@ -90,10 +108,11 @@ public class ArrayDeque<Item> {
      */
     public Item removeLast() {
 
-        Item last = getBack();
-        items[size - 1] = null;
+        Item removed = items[pointerLast - 1];
+        items[pointerLast - 1] = null;
+        pointerLast--;
         size--;
-        return last;
+        return removed;
     }
 
     /*
@@ -102,12 +121,6 @@ public class ArrayDeque<Item> {
      */
     public Item get(int index) {
 
-        if (index > size) return null;
-
         return items[index];
     }
-
-
-
-
 }
