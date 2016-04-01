@@ -6,7 +6,6 @@ public class ArrayDeque<Item> {
     private int pointerLast;
     private static int RFACTOR = 2;
 
-
     public ArrayDeque() {
 
         size = 0;
@@ -15,13 +14,38 @@ public class ArrayDeque<Item> {
         items = (Item[]) new Object[8];
     }
 
-    private int minusOne(int index) {
+    private void sizeDecrease(int capacity) {
 
-        if (index == 0) {return items.length;}
-        return index - 1;
+        Item[] fresh = (Item[]) new Object[capacity];
+
+        if (pointerFirst > pointerLast) {
+
+            for (int i = 0; i <= pointerLast; i++) {
+                fresh[i] = items[i];
+            }
+
+            for (int i = pointerFirst + 1; i < items.length; i++) {
+                fresh[i - capacity] = items[i];
+            }
+
+            pointerFirst -= capacity;
+            items = fresh;
+
+        } else {
+
+            int newIndex = 1;
+            for (int i = pointerFirst+ 1; i < pointerLast; i++) {
+                fresh[newIndex] = items[i];
+                newIndex++;
+            }
+
+            pointerFirst = 0;
+            pointerLast = newIndex;
+            items = fresh;
+        }
     }
 
-    private void resize(int capacity) {
+    private void sizeIncrease(int capacity) {
 
         Item[] fresh = (Item[]) new Object[capacity];
 
@@ -42,11 +66,17 @@ public class ArrayDeque<Item> {
      */
     public void addFirst(Item i) {
 
-        if (size == items.length) { resize(size * RFACTOR); }
+        if (size == items.length) {
+            sizeIncrease(size * RFACTOR);
+        }
 
         items[pointerFirst] = i;
         pointerFirst--;
-        if (pointerFirst < 0) { pointerFirst = items.length - 1;}
+
+        if (pointerFirst < 0) {
+            pointerFirst = items.length - 1;
+        }
+
         size++;
     }
 
@@ -55,11 +85,17 @@ public class ArrayDeque<Item> {
      */
     public void addLast(Item i) {
 
-        if (size == items.length) { resize(size * RFACTOR); }
+        if (size == items.length) {
+            sizeIncrease(size * RFACTOR);
+        }
 
         items[pointerLast] = i;
         pointerLast++;
-        if (pointerLast == items.length) { pointerLast = 0;}
+
+        if (pointerLast == items.length) {
+            pointerLast = 0;
+        }
+
         size++;
     }
 
@@ -67,7 +103,6 @@ public class ArrayDeque<Item> {
     Returns true if deque is empty, false otherwise.
      */
     public boolean isEmpty() {
-
         return size==0;
     }
 
@@ -75,7 +110,6 @@ public class ArrayDeque<Item> {
     Returns the number of items in the Deque.
      */
     public int size() {
-
         return size;
     }
 
@@ -83,10 +117,10 @@ public class ArrayDeque<Item> {
     Prints the items in the Deque from first to last, separated by a space.
      */
     public void printDeque() {
+
         for (int i = 0; i < items.length; i++) {
             System.out.print(this.get(i) + " ");
         }
-
     }
 
     /*
@@ -95,10 +129,19 @@ public class ArrayDeque<Item> {
      */
     public Item removeFirst() {
 
+        if (pointerFirst == items.length - 1) {
+            pointerFirst = -1;
+        }
+
         Item removed = items[pointerFirst + 1];
         items[pointerFirst + 1] = null;
         pointerFirst++;
         size--;
+
+        if (needDecrease()) {
+            sizeDecrease(items.length / RFACTOR);
+        }
+
         return removed;
     }
 
@@ -108,11 +151,28 @@ public class ArrayDeque<Item> {
      */
     public Item removeLast() {
 
+        if (pointerLast == 0) {
+            pointerLast = items.length;
+        }
+
         Item removed = items[pointerLast - 1];
         items[pointerLast - 1] = null;
         pointerLast--;
         size--;
+
+        if (needDecrease()) {
+            sizeDecrease(items.length / RFACTOR);
+        }
+
         return removed;
+    }
+
+    private boolean needDecrease() {
+
+        if (items.length >= 16) {
+            return (items.length / size) >= 4;
+        }
+        return false;
     }
 
     /*
@@ -124,3 +184,4 @@ public class ArrayDeque<Item> {
         return items[index];
     }
 }
+
