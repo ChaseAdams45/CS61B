@@ -13,8 +13,20 @@ import java.util.List;
  */
 public class Plip extends Creature {
 
+    /** Amount of energy used per move. */
     private static final double ENERGY_TO_MOVE = 0.15;
+
+    /** Amount of energy gained per stay tick. */
     private static final double ENERGY_GAIN = 0.2;
+
+    /** Fraction of energy to retain when replicating. */
+    private static final double ENERGY_REPLICATE_MODIFIER = 0.5;
+
+    /** Fraction of energy transferred to offspring. */
+    private static final double ENERGY_TO_OFFSPRING_MODIFIER = 0.5;
+
+    /** Maximum energy cap. */
+    private static final double MAX_ENERGY = 2.0;
 
     /** red color. */
     private int r;
@@ -74,8 +86,8 @@ public class Plip extends Creature {
     /** Plips gain 0.2 energy when staying due to photosynthesis. */
     public void stay() {
         energy = energy + ENERGY_GAIN;
-        if (energy > 2) {
-            energy = 2;
+        if (energy > MAX_ENERGY) {
+            energy = MAX_ENERGY;
         }
     }
 
@@ -84,8 +96,9 @@ public class Plip extends Creature {
      *  Plip.
      */
     public Plip replicate() {
-        energy = energy / 2;
-        return new Plip(energy);
+        double offspringEnergy = energy * ENERGY_TO_OFFSPRING_MODIFIER;
+        energy = energy * ENERGY_REPLICATE_MODIFIER;
+        return new Plip(offspringEnergy);
     }
 
     /** Plips take exactly the following actions based on NEIGHBORS:
@@ -112,7 +125,7 @@ public class Plip extends Creature {
                     HugLifeUtils.randomEntry(empties));
         }
 
-        if (cloruses.size() > 0) {
+        if (cloruses.size() > 0 && HugLifeUtils.random() < 0.5) {
             return new Action(Action.ActionType.MOVE,
                     HugLifeUtils.randomEntry(empties));
         }
@@ -120,4 +133,3 @@ public class Plip extends Creature {
         return new Action(Action.ActionType.STAY);
     }
 }
-
