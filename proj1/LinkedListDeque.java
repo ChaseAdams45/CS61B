@@ -5,10 +5,10 @@ public class LinkedListDeque<Item> {
         public Node next;
         public Node prev;
 
-        public Node(Item i, Node n, Node p) {
+        public Node(Item i) {
             item = i;
-            next = n;
-            prev = p;
+            next = null;
+            prev = null;
         }
     }
 
@@ -17,7 +17,9 @@ public class LinkedListDeque<Item> {
 
     public LinkedListDeque() {
         size = 0;
-        sentinel = new Node(null, sentinel, sentinel);
+        sentinel = new Node(null);
+        sentinel.next = sentinel;
+        sentinel.prev = sentinel;
 
     }
 
@@ -25,41 +27,40 @@ public class LinkedListDeque<Item> {
     Adds an item to the front of the Deque.
      */
     public void addFirst(Item i) {
-
-        if (size == 0) {
-            sentinel.next = new Node(i, sentinel, sentinel);
-            sentinel.prev = sentinel.next;
-            size++;
-        } else {
-            Node oldnext = sentinel.next;
-            sentinel.next = new Node(i, sentinel, oldnext);
-            oldnext.prev = sentinel.next;
-            size++;
+        if (item == null) {
+            throw new java.lang.NullPointerException();
         }
+
+        Node first = new Node(item);
+        first.prev = sentinel;
+        first.next = sentinel.next;
+
+        sentinel.next.prev = first;
+        sentinel.next = first;
+        size++;
     }
 
     /*
     Adds an item to the back of the Deque.
      */
     public void addLast(Item i) {
-
-        if (size == 0) {
-            sentinel.next = new Node(i, sentinel, sentinel);
-            sentinel.prev = sentinel.next;
-            size++;
-        } else {
-            Node oldprev = sentinel.prev;
-            sentinel.prev = new Node(i, oldprev, sentinel);
-            oldprev.next = sentinel.prev;
-            size++;
+        if (item == null) {
+            throw new java.lang.NullPointerException();
         }
+
+        Node last = new Node(item);
+        last.prev = sentinel.prev;
+        last.next = sentinel;
+
+        sentinel.prev.next = last;
+        sentinel.prev = last;
+        size++;
     }
 
     /*
     Returns true if deque is empty, false otherwise.
      */
     public boolean isEmpty() {
-
         return size == 0;
     }
 
@@ -67,7 +68,6 @@ public class LinkedListDeque<Item> {
     Returns the number of items in the Deque.
      */
     public int size() {
-
         return size;
     }
 
@@ -75,7 +75,6 @@ public class LinkedListDeque<Item> {
     Prints the items in the Deque from first to last, separated by a space.
      */
     public void printDeque() {
-
         for (int i = 0; i < this.size(); i++) {
             System.out.print(this.get(i) + " ");
         }
@@ -86,12 +85,13 @@ public class LinkedListDeque<Item> {
     If no such item exists, returns null.
      */
     public Item removeFirst() {
-
         Node oldfirst = sentinel.next;
-        sentinel.next = sentinel.next.next;
-        sentinel.next.prev = sentinel;
+        Item olditem = oldfirst.item;
+        sentinel.next = oldfirst.next;
+        oldfirst.next.prev = sentinel;
         size--;
-        return oldfirst.item;
+        oldfirst = null;
+        return olditem;
     }
 
     /*
@@ -99,12 +99,13 @@ public class LinkedListDeque<Item> {
     If no such item exists, returns null.
      */
     public Item removeLast() {
-
         Node oldlast = sentinel.prev;
-        sentinel.prev = sentinel.prev.prev;
-        sentinel.prev.next = sentinel;
+        Item olditem = oldlast.item;
+        sentinel.prev = oldlast.prev;
+        oldlast.prev.next = sentinel;
         size--;
-        return oldlast.item;
+        oldlast = null;
+        return olditem;
     }
 
     /*
