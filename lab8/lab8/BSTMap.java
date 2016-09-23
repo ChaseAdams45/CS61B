@@ -3,6 +3,7 @@ package lab8;
 import java.util.Iterator;
 import java.util.Set;
 
+
 public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     private Node root;
@@ -42,7 +43,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     }
 
     @Override
-    public void  clear() {
+    public void clear() {
         root = null;
     }
 
@@ -54,9 +55,9 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     private V get(Node x, K key) {
         if (x == null) return null;
         int cmp = key.compareTo(x.key);
-        if      (cmp < 0) return get(x.left, key);
+        if (cmp < 0) return get(x.left, key);
         else if (cmp > 0) return get(x.right, key);
-        else              return x.val;
+        else return x.val;
     }
 
     @Override
@@ -70,9 +71,9 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     private Node put(Node x, K key, V value) {
         if (x == null) return new Node(key, value, 1);
         int cmp = key.compareTo(x.key);
-        if      (cmp < 0) x.left  = put(x.left,  key, value);
+        if (cmp < 0) x.left = put(x.left, key, value);
         else if (cmp > 0) x.right = put(x.right, key, value);
-        else              x.val   = value;
+        else x.val = value;
         x.size = 1 + size(x.left) + size(x.right);
         return x;
     }
@@ -100,16 +101,27 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
      * Prints out BSTMap in order of increasing Key.
      */
     public void printInOrder() {
-
+        printInOrder(root);
     }
 
-    public static void main(String[] args) {
-        BSTMap<String, Integer> a = new BSTMap<String, Integer>();
-
-        for (int i = 0; i < 455; i++) {
-            a.put("hi" + i, i);
-            System.out.println(a.get("hi" + i));
+    private void printInOrder(Node node) {
+        if (node.left == null && node.right == null) {
+            printNode(node);
+        } else if (node.left == null) {
+            printNode(node);
+            printInOrder(node.right);
+        } else if (node.right == null) {
+            printInOrder(node.left);
+            printNode(node);
+        } else {
+            printInOrder(node.left);
+            printNode(node);
+            printInOrder(node.right);
         }
-        //a.printInOrder();
+    }
+
+    private void printNode(Node node) {
+        System.out.print(node.key);
+        System.out.println(" " + node.val);
     }
 }
