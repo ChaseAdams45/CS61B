@@ -115,7 +115,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     private void resize() {
         int newsize = size * 2;
-        MyHashMap<K, V> newMap =  new MyHashMap<>(newsize);
+        MyHashMap<K, V> newMap =  new MyHashMap<>(newsize, loadFactor);
         for (Entry<K, V> e : entrySet()) {
             newMap.put(e.key, e.value);
         }
